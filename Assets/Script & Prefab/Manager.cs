@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using JetBrains.Annotations;
 using UnityEngine.UI;
+using System;
 
 public class Manager : MonoBehaviour
 {
@@ -12,6 +13,14 @@ public class Manager : MonoBehaviour
     public List<float> MoneyAccount;   // Liste des montants d'argent associés aux comptes
     public List<GameObject> AccountInBar;
     public List<GameObject> entryExitObjects = new List<GameObject>();
+
+    public List<string> CategoryName;
+    public List<Sprite> CategorySprite;
+    public List<string> CategoryDescription;
+
+    public GameObject AddCategoryPanel;
+    public GameObject CategoryPanel;
+
 
 
     public Transform accountBarParent; 
@@ -33,7 +42,7 @@ public class Manager : MonoBehaviour
     public ScrollViewManager scrollViewManager;
 
 
-    public bool AtoZ;
+    public bool DateCroissant;
     
 
     // Start is called before the first frame update
@@ -144,9 +153,9 @@ public class Manager : MonoBehaviour
         filterManager.UpdateFilterList(Account);
     }
 
-    public void AddEntryExit(string name, float Money, string account)
+    public void AddEntryExit(string name, float Money, string account, DateTime date, string category)
     {
-        scrollViewManager.AddEntry(name, Money, account);
+        scrollViewManager.AddEntry(name, Money, account, date, category);
         ListEntryExitUpdate();
         int index = Account.IndexOf(account);
         MoneyAccount[index] = MoneyAccount[index] + Money;
@@ -163,12 +172,44 @@ public class Manager : MonoBehaviour
 
 
     }
-
-    public void DeleteEntryExit()
+    public void DateCroissantFilter()
     {
+        DateCroissant = true;
+        ListEntryExitUpdate();
 
     }
+    public void AddCategory(string name, Sprite sprite, string description)
+    {
+        CategoryName.Add(name);
+        CategorySprite.Add(sprite);
+        CategoryDescription.Add(description);
+    }
 
+    public void CreateAddCategoryPanel(CategoryPanel categoryPanel)
+    {
+        GameObject Panel = Instantiate(AddCategoryPanel, this.gameObject.transform);
+        Panel.GetComponent<AddCategory>().categoryPanel = categoryPanel;
+    }
+
+    public void CreateCategoryPanel()
+    {
+
+        CategoryPanel existingPanel = FindAnyObjectByType<CategoryPanel>();
+
+        if (existingPanel != null)
+        {
+            GameObject CategoryPanel = FindAnyObjectByType<CategoryPanel>().gameObject;
+            Destroy(CategoryPanel);
+
+        }
+        else
+        {
+
+            GameObject Panel = Instantiate(CategoryPanel, this.gameObject.transform);
+
+        }
+
+    }
     public void moveScreenButton (RectTransform target)
     {
         StartCoroutine(MoveScreen(target));
@@ -231,26 +272,22 @@ public class Manager : MonoBehaviour
         }
 
         // Trier entryExitObjects en ordre alphabétique par le nom du compte si AtoZ est vrai
-        if (AtoZ)
+        if (DateCroissant)
         {
-            // Trier la liste entryExitObjects par nom de compte
-            entryExitObjects.Sort((a, b) =>
+            entryExitObjects.Sort((obj1, obj2) =>
             {
-                EntryExit entryA = a.GetComponent<EntryExit>();
-                EntryExit entryB = b.GetComponent<EntryExit>();
+                EntryExit entryExit1 = obj1.GetComponent<EntryExit>();
+                EntryExit entryExit2 = obj2.GetComponent<EntryExit>();
 
-                if (entryA == null || entryB == null)
-                    return 0;
-
-                return string.Compare(entryA.Title, entryB.Title, System.StringComparison.Ordinal);
+                // Comparer les dates de manière décroissante
+                return entryExit2.Date.CompareTo(entryExit1.Date);
             });
+        }
 
-            // Réorganiser les enfants dans la hiérarchie Unity en fonction de l'ordre trié
-            for (int i = 0; i < entryExitObjects.Count; i++)
-            {
-                // Définir l'index des enfants en fonction de l'ordre dans entryExitObjects
-                entryExitObjects[i].transform.SetSiblingIndex(i);
-            }
+        // Mettre à jour l'ordre des objets enfants dans la hiérarchie
+        for (int i = 0; i < entryExitObjects.Count; i++)
+        {
+            entryExitObjects[i].transform.SetSiblingIndex(i);
         }
     }
 

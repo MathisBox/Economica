@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,12 +18,14 @@ public class ScrollViewManager : MonoBehaviour
     }
 
 
-    public void AddEntry(string name, float money, string account)
+    public void AddEntry(string name, float money, string account, DateTime date, string category)
     {
         GameObject newEntry = Instantiate(entryPrefab, contentPanel);
         newEntry.GetComponent<EntryExit>().Title = name;
         newEntry.GetComponent<EntryExit>().Money = money;
         newEntry.GetComponent<EntryExit>().Account = account;
+        newEntry.GetComponent<EntryExit>().Date = date;
+        newEntry.GetComponent<EntryExit>().Category = category;
         AllEntryExit.Add(newEntry); 
     }
     public void SetActiveEntryExit()

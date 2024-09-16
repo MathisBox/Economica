@@ -17,12 +17,8 @@ public class FilterPanel : MonoBehaviour
         
     }
 
-    public void Filter(string type)
+    public void OpenFilterPanel()
     {
-        if (type == "AtoZ")
-        {
-            manager.AtoZ = true;
-            manager.UpdateFilter();
-        }
+        
     }
 }

@@ -86,13 +86,7 @@ public class AccountFilterManager : MonoBehaviour
     }
 
 
-    void SetFilters(string type)
-    {
-        if(type == "AtoZ")
-        {
-            manager.entryExitObjects.Sort();
-        }
-    }
+    
 
 
     // Méthode pour définir la couleur d'un bouton
